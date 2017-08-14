@@ -3,7 +3,7 @@ package manager
 import (
   "fmt"
   "log"
-  "flag"
+  // "flag"
   "time"
   "errors"
   "strings"
@@ -85,13 +85,13 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 
   if response.Type == "service" {
     // Testing only has one node, the master node
-    placement := &swarm.Placement{}
+    // placement := &swarm.Placement{}
 
-    if flag.Lookup("test.v") == nil {
-      placement = &swarm.Placement{
-        Constraints: []string{"node.role == worker"},
-      }
-    }
+    // if flag.Lookup("test.v") == nil {
+    //   placement = &swarm.Placement{
+    //     Constraints: []string{"node.role == worker"},
+    //   }
+    // }
 
     serviceSpec := swarm.ServiceSpec{
       TaskTemplate: swarm.TaskSpec{
@@ -99,7 +99,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
           Image: response.Image,
           Command: command,
         },
-        Placement: placement,
+        // Placement: placement,
         RestartPolicy: &swarm.RestartPolicy{
           Condition: "none",
         },
