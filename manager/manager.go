@@ -24,6 +24,7 @@ type PostRequest struct {
   Token string `json:"token"`
   Command string `json:"command"`
   Image string `json:"image"`
+  Auth string `json:"auth"`
   Type string `json:"type"`
   Id string `json:"id"`
 }
@@ -35,6 +36,7 @@ type PostErrorResponse struct {
   Success bool `json:"success"`
   Code int `json:"code"`
   Error string `json:"error"`
+  Auth bool `json:"auth"`
   Id string `json:"id"`
 }
 
@@ -93,6 +95,20 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
     //   }
     // }
 
+    pullOptions := types.ImagePullOptions{}
+    if response.Auth != "" {
+      pullOptions = types.ImagePullOptions{
+        RegistryAuth: response.Auth,
+      }
+    }
+    _, err := cli.ImagePull(ctx, response.Image, pullOptions)
+
+    if err != nil {
+      payload := PostErrorResponse{Success: false, Error: err.Error(), Auth: response.Auth != ""}
+      _ = json.NewEncoder(w).Encode(payload)
+      return
+    }
+
     serviceSpec := swarm.ServiceSpec{
       TaskTemplate: swarm.TaskSpec{
         ContainerSpec: swarm.ContainerSpec{
@@ -106,7 +122,13 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
       },
     }
 
-    resp, err := cli.ServiceCreate(ctx, serviceSpec, types.ServiceCreateOptions{})
+    serviceOptions := types.ServiceCreateOptions{}
+    if response.Auth != "" {
+      serviceOptions = types.ServiceCreateOptions{
+        EncodedRegistryAuth: response.Auth,
+      }
+    }
+    resp, err := cli.ServiceCreate(ctx, serviceSpec, serviceOptions)
     if err != nil {
       payload := PostErrorResponse{Success: false, Error: err.Error()}
       _ = json.NewEncoder(w).Encode(payload)
