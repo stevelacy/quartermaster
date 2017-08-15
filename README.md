@@ -25,6 +25,52 @@ Using the `--token` flag:
 
 `$ ./quartermaster --token=4jrs8-534js-345ds-3lrd0`
 
+
+## Usage
+
+#### /start
+
+Start a service on any node in a swarm:
+
+```curl
+$ curl -X POST \
+  http://localhost:9090/run \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{
+  "token": "4jrs8-534js-345ds-3lrd0",
+  "command": "node index.js",
+  "image": "user/image",
+  "type": "service"
+}'
+
+$
+{
+  "success": true,
+  "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
+}
+```
+
+#### /stop
+
+Stop and remove a service on the swarm:
+```curl
+$ curl -X POST \
+  http://localhost:9090/stop \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{
+  "token": "4jrs8-534js-345ds-3lrd0",
+  "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
+}'
+
+$
+{
+  "success": true,
+  "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
+}
+```
+
 ### Authentication from private registries
 Pass the `auth` key in the `run` request for it to pull from the private registry per swarm node.
 
@@ -59,3 +105,11 @@ Because the quartermaster application connects to docker, the parent (swarm) doc
 
 #### Docker run
 `$ docker run -d -e TOKEN=4jrs8-534js-345ds-3lrd0 -p 9090:9090 -v /var/run/docker.sock:/var/run/docker.sock stevelacy/quartermaster`
+
+
+### Building the docker image
+
+`$ ./build.sh`
+
+
+## LICENSE [MIT](LICENSE)
