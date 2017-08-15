@@ -111,9 +111,10 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 
     serviceSpec := swarm.ServiceSpec{
       TaskTemplate: swarm.TaskSpec{
-        ContainerSpec: swarm.ContainerSpec{
+        ContainerSpec: &swarm.ContainerSpec{
           Image: response.Image,
           Command: command,
+          StopSignal: "SIGINT",
         },
         // Placement: placement,
         RestartPolicy: &swarm.RestartPolicy{
