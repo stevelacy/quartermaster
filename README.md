@@ -28,9 +28,9 @@ Using the `--token` flag:
 
 ## Usage
 
-#### /start
+#### /run
 
-Start a service on any node in a swarm:
+Run a service on any node in a swarm:
 
 ```curl
 $ curl -X POST \
