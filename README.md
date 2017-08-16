@@ -106,6 +106,17 @@ Because the quartermaster application connects to docker, the parent (swarm) doc
 #### Docker run
 `$ docker run -d -e TOKEN=4jrs8-534js-345ds-3lrd0 -p 9090:9090 -v /var/run/docker.sock:/var/run/docker.sock stevelacy/quartermaster`
 
+#### Docker swarm
+**ensure the service is running only on a manager node**
+
+```bash
+docker service create --name quartermaster \
+  -e TOKEN=4jrs8-534js-345ds-3lrd0 \
+  -p 9090:9090 \
+  --constraint 'node.role == manager' \
+  --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock \
+  stevelacy/quartermaster
+```
 
 ### Building the docker image
 
