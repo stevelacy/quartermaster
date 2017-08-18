@@ -26,6 +26,7 @@ type PostRequest struct {
   Image string `json:"image"`
   Auth string `json:"auth"`
   Type string `json:"type"`
+  Label string `json:"name"`
   Id string `json:"id"`
 }
 type PostSuccessResponse struct {
@@ -113,6 +114,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
       TaskTemplate: swarm.TaskSpec{
         ContainerSpec: &swarm.ContainerSpec{
           Image: response.Image,
+          Labels: map[string]string{"name": response.Label},
           Command: command,
           StopSignal: "SIGINT",
         },
