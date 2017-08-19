@@ -41,6 +41,7 @@ $ curl -X POST \
   "token": "4jrs8-534js-345ds-3lrd0",
   "command": "node index.js",
   "image": "user/image",
+  "name": "my_service",
   "type": "service"
 }'
 
@@ -50,6 +51,7 @@ $
   "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
 }
 ```
+Omitting the param `"type": "service"` will run the command as a container
 
 #### /stop
 

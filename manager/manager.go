@@ -26,7 +26,8 @@ type PostRequest struct {
   Image string `json:"image"`
   Auth string `json:"auth"`
   Type string `json:"type"`
-  Label string `json:"name"`
+  Label string `json:"label"`
+  Name string `json:"name"`
   Id string `json:"id"`
 }
 type PostSuccessResponse struct {
@@ -111,6 +112,9 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
     }
 
     serviceSpec := swarm.ServiceSpec{
+      Annotations: swarm.Annotations{
+        Name: response.Name,
+      },
       TaskTemplate: swarm.TaskSpec{
         ContainerSpec: &swarm.ContainerSpec{
           Image: response.Image,
@@ -145,7 +149,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
   resp, err := cli.ContainerCreate(ctx, &container.Config{
     Image: response.Image,
     Cmd: command,
-  }, nil, nil, "")
+  }, nil, nil, response.Name)
   if err != nil {
     payload := PostErrorResponse{Success: false, Error: err.Error()}
     _ = json.NewEncoder(w).Encode(payload)
