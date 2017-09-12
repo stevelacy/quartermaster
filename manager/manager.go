@@ -96,6 +96,9 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 		//     Constraints: []string{"node.role == worker"},
 		//   }
 		// }
+		placement := &swarm.Placement{
+			Constraints: []string{"node.role == worker"},
+		}
 
 		pullOptions := types.ImagePullOptions{}
 		if response.Auth != "" {
@@ -122,7 +125,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 					Command:    command,
 					StopSignal: "SIGINT",
 				},
-				// Placement: placement,
+				Placement: placement,
 				RestartPolicy: &swarm.RestartPolicy{
 					Condition: "none",
 				},

@@ -26,6 +26,9 @@ Using the `--token` flag:
 `$ ./quartermaster --token=4jrs8-534js-345ds-3lrd0`
 
 
+**Note:** all jobs are run on docker swarm nodes with `role=worker`
+
+
 ## Usage
 
 #### /run
