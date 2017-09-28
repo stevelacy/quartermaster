@@ -1,9 +1,12 @@
 package main
 
-import "os"
-import "flag"
-import "fmt"
-import "github.com/stevelacy/quartermaster/manager"
+import (
+	"flag"
+	"fmt"
+	"github.com/stevelacy/quartermaster/manager"
+	"net/http"
+	"os"
+)
 
 func main() {
 	fmt.Printf("Starting quartermaster \n")
@@ -20,5 +23,10 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	manager.Init(*token, ":9090")
+	port := ":9090"
+	err := http.ListenAndServe(port, manager.Init(*token))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Listening on port", port)
 }
