@@ -60,9 +60,6 @@ type NodeSpec struct {
 	Addr            string
 	Role            string
 	State           string
-	IsLeader        bool
-	LeaderAddr      string
-	LeaderReachable string
 	Memory          int64
 	AvailableMemory int64
 	Cpu             int64
@@ -227,21 +224,18 @@ func CollectNodes(ctx context.Context, cli *client.Client) {
 			fmt.Println(err)
 		}
 		nodeSpec := NodeSpec{
-			Hostname:        details.Description.Hostname,
-			Name:            details.Spec.Name,
-			Id:              details.ID,
-			Arch:            details.Description.Platform.Architecture,
-			OS:              details.Description.Platform.OS,
-			Addr:            details.Status.Addr,
-			Role:            string(details.Spec.Role),
-			Status:          string(details.Status.Message),
-			State:           string(details.Status.State),
-			LeaderReachable: string(details.ManagerStatus.Reachability),
-			IsLeader:        details.ManagerStatus.Leader,
-			LeaderAddr:      details.ManagerStatus.Addr,
-			Cpu:             details.Description.Resources.NanoCPUs / CONVERT_CPU,   // Convert from NanoCPUs to cpus
-			Memory:          details.Description.Resources.MemoryBytes / CONVERT_MB, // Convert bytes to MB
-			Version:         details.Meta.Version,
+			Hostname: details.Description.Hostname,
+			Name:     details.Spec.Name,
+			Id:       details.ID,
+			Arch:     details.Description.Platform.Architecture,
+			OS:       details.Description.Platform.OS,
+			Addr:     details.Status.Addr,
+			Role:     string(details.Spec.Role),
+			Status:   string(details.Status.Message),
+			State:    string(details.Status.State),
+			Cpu:      details.Description.Resources.NanoCPUs / CONVERT_CPU,   // Convert from NanoCPUs to cpus
+			Memory:   details.Description.Resources.MemoryBytes / CONVERT_MB, // Convert bytes to MB
+			Version:  details.Meta.Version,
 		}
 		_, exists := nodes[nodeSpec.Id]
 		if exists {
