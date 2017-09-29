@@ -256,12 +256,20 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 	}
 
 	running := 0
+	stopped := 0
+	failed := 0
 	for _, task := range taskList {
 		if task.Status.State == "running" {
 			running = running + 1
 		}
+		if task.Status.State == "stopped" {
+			stopped = stopped + 1
+		}
+		if task.Status.State == "failed" {
+			failed = failed + 1
+		}
 	}
-	fmt.Printf("CollectServices: total: %v running: %v \n", len(taskList), running)
+	fmt.Printf("CollectServices: total: %v running: %v stopped: %v failed: %v \n", len(taskList), running, stopped, failed)
 
 	// Check if they are deleted
 	filtered := make(map[string]ServiceSpec)
