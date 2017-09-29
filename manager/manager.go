@@ -149,7 +149,7 @@ func Init(token string) http.Handler {
 
 					placement := &swarm.Placement{
 						Constraints: []string{
-							// "node.role == worker", // Disable for local testing
+							"node.role == worker", // Disable for local testing
 							fmt.Sprintf("node.id == %v", availableNode.Id),
 						},
 					}
@@ -248,7 +248,7 @@ func CollectNodes(ctx context.Context, cli *client.Client) {
 			nodeSpec.AvailableMemory = nodes[nodeSpec.Id].AvailableMemory
 		}
 		if nodeSpec.AvailableMemory == 0 {
-			nodeSpec.AvailableMemory = 1000 * CONVERT_MB // nodeSpec.Memory * CONVERT_MB
+			nodeSpec.AvailableMemory = nodeSpec.Memory * CONVERT_MB
 		}
 		nodes[nodeSpec.Id] = nodeSpec
 		// TODO: remove if not existing
