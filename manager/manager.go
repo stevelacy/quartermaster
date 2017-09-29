@@ -20,7 +20,7 @@ import (
 var root_token string = ""
 var CONVERT_MB int64 = 1048576
 var CONVERT_CPU int64 = 1000000000
-var DEFAULT_MEMORY int64 = 1024 * CONVERT_MB // 1GB
+var DEFAULT_MEMORY int64 = 250 * CONVERT_MB // 250mb
 var NODE_INTERVAL time.Duration = time.Minute * 5
 var SERVICE_INTERVAL time.Duration = time.Second * 10
 
@@ -128,7 +128,7 @@ func Init(token string) http.Handler {
 						for _, node := range nodes {
 							// TODO: global style mode for requesting nodes
 							// if node.AvailableMemory > task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes {
-							fmt.Println(node.AvailableMemory, task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes)
+							fmt.Println("node: ", node.Id, node.AvailableMemory, task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes)
 							if node.AvailableMemory > task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes {
 								availableNode = node
 								break
