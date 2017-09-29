@@ -27,14 +27,14 @@ var SERVICE_INTERVAL time.Duration = time.Second * 10
 var Queue = make(chan QueueSpec, 100)
 
 type PostRequest struct {
-	Token   string `json:"token"`
-	Command string `json:"command"`
-	Image   string `json:"image"`
-	Auth    string `json:"auth"`
-	Type    string `json:"type"`
-	Label   string `json:"label"`
-	Name    string `json:"name"`
-	Id      string `json:"id"`
+	Token   string            `json:"token"`
+	Command string            `json:"command"`
+	Image   string            `json:"image"`
+	Auth    string            `json:"auth"`
+	Type    string            `json:"type"`
+	Labels  map[string]string `json:"labels`
+	Name    string            `json:"name"`
+	Id      string            `json:"id"`
 	// Cpu     int64  `json:"cpu"`
 	Memory int64 `json:"memory"`
 }
@@ -347,7 +347,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 			TaskTemplate: swarm.TaskSpec{
 				ContainerSpec: &swarm.ContainerSpec{
 					Image:      response.Image,
-					Labels:     map[string]string{"name": response.Label},
+					Labels:     response.Labels,
 					Command:    command,
 					StopSignal: "SIGINT",
 				},
