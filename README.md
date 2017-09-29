@@ -45,6 +45,7 @@ $ curl -X POST \
   "command": "node index.js",
   "image": "user/image",
   "name": "my_service",
+  "labels": { "name": "value" },
   "type": "service",
   "memory": 1024
 }'
@@ -64,7 +65,7 @@ Options:
 - name: name of service or container
 - type: type of operation, service or container (Note: must be service on a docker swarm)
 - memory: memory limit for service or container
--
+- labels: set of labels for the service
 
 #### /stop
 
