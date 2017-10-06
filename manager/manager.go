@@ -145,7 +145,7 @@ func Init(token string) http.Handler {
 
 					placement := &swarm.Placement{
 						Constraints: []string{
-							"node.role == worker", // Disable for local testing
+							// "node.role == worker", // Disable for local testing
 							fmt.Sprintf("node.id == %v", availableNode.Id),
 						},
 					}
@@ -182,7 +182,9 @@ func Init(token string) http.Handler {
 					// Update recorded memory
 					updatedNode := nodes[availableNode.Id]
 					updatedNode.AvailableMemory = updatedNode.AvailableMemory - requiredMemory
+					fmt.Println("reduced node mem", updatedNode.AvailableMemory/CONVERT_MB)
 					nodes[availableNode.Id] = updatedNode
+					fmt.Println(nodes[availableNode.Id].AvailableMemory / CONVERT_MB)
 				}()
 			}
 		}
@@ -277,6 +279,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 		}
 		if found == false {
 			// Delete it
+			fmt.Println("Deleting service")
 			updatedNode := nodes[existing.NodeId]
 			updatedNode.AvailableMemory = updatedNode.AvailableMemory + existing.Memory
 			nodes[existing.NodeId] = updatedNode
@@ -314,11 +317,11 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 		//   }
 		// }
 
-		placement := &swarm.Placement{
-			Constraints: []string{
-				"node.role == worker",
-			},
-		}
+		// placement := &swarm.Placement{
+		// 	Constraints: []string{
+		// 		"node.role == worker",
+		// 	},
+		// }
 
 		pullOptions := types.ImagePullOptions{}
 		if response.Auth != "" {
@@ -357,7 +360,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 						MemoryBytes: int64(requiredMemory),
 					},
 				},
-				Placement: placement,
+				// Placement: placement,
 				RestartPolicy: &swarm.RestartPolicy{
 					Condition: "none",
 				},
