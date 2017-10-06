@@ -127,10 +127,9 @@ func Init(token string) http.Handler {
 					for availableNode.Id == "" {
 						for _, node := range nodes {
 							// TODO: global style mode for requesting nodes
-							// if node.AvailableMemory > task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes {
-							fmt.Println("node: ", node.Id, node.AvailableMemory, task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes)
 							if node.AvailableMemory > task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes {
 								availableNode = node
+								fmt.Println("scheduled task on node: ", node.Id, "node mem: ", node.AvailableMemory/CONVERT_MB, "task mem:", task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes/CONVERT_MB)
 								break
 							}
 							// Wait 5 seconds to retry
@@ -164,6 +163,8 @@ func Init(token string) http.Handler {
 						fmt.Println(err)
 						return
 					}
+
+					fmt.Println("Starting task: ", task.Id, task.ServiceSpec.Name)
 
 					addService := ServiceSpec{
 						Id:        task.Id,
@@ -261,7 +262,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 		updatedCount := counts[string(task.Status.State)] + 1
 		counts[string(task.Status.State)] = updatedCount
 	}
-	fmt.Printf("Services: total: %v running: %v stopped: %v complete: %v shutdown: %v failed: %v \n", len(taskList), counts["running"], counts["stopped"], counts["complete"], counts["shutdown"], counts["failed"])
+	fmt.Printf("Services: total: %v running: %v stopped: %v complete: %v shutdown: %v failed: %v pending: %v \n", len(taskList), counts["running"], counts["stopped"], counts["complete"], counts["shutdown"], counts["failed"], len(Queue))
 
 	// Check if they are deleted
 	filtered := make(map[string]ServiceSpec)
