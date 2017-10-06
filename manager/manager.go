@@ -22,7 +22,7 @@ var CONVERT_MB int64 = 1048576
 var CONVERT_CPU int64 = 1000000000
 var DEFAULT_MEMORY int64 = 250 * CONVERT_MB // 250mb
 var NODE_INTERVAL time.Duration = time.Minute * 5
-var SERVICE_INTERVAL time.Duration = time.Second * 10
+var SERVICE_INTERVAL time.Duration = time.Second * 30
 
 var Queue = make(chan QueueSpec, 100)
 
@@ -182,9 +182,7 @@ func Init(token string) http.Handler {
 					// Update recorded memory
 					updatedNode := nodes[availableNode.Id]
 					updatedNode.AvailableMemory = updatedNode.AvailableMemory - requiredMemory
-					fmt.Println("reduced node mem", updatedNode.AvailableMemory/CONVERT_MB)
 					nodes[availableNode.Id] = updatedNode
-					fmt.Println(nodes[availableNode.Id].AvailableMemory / CONVERT_MB)
 				}()
 			}
 		}
