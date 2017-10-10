@@ -127,7 +127,7 @@ func Init(token string) http.Handler {
 					for availableNode.Id == "" {
 						for _, node := range nodes {
 							// TODO: global style mode for requesting nodes
-							if node.Role == "manager" {
+							if node.State != "ready" {
 								continue
 							}
 							if node.AvailableMemory > task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes {
@@ -135,9 +135,9 @@ func Init(token string) http.Handler {
 								fmt.Println("scheduled task on node: ", node.Id, "node mem: ", node.AvailableMemory/CONVERT_MB, "task mem:", task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes/CONVERT_MB)
 								break
 							}
-							// Wait 5 seconds to retry
-							time.Sleep(time.Second * 5)
 						}
+						// Wait 5 seconds to skip or retry
+						time.Sleep(time.Second * 5)
 					}
 
 					serviceInspect, _, err := cli.ServiceInspectWithRaw(task.Ctx, task.Id, types.ServiceInspectOptions{})
@@ -221,7 +221,6 @@ func CollectNodes(ctx context.Context, cli *client.Client) {
 	if len(nodeList) == 0 {
 		fmt.Println(errors.New("Error - no nodes found. Is this a swarm?"))
 	}
-	fmt.Println("CollectNodes", len(nodeList))
 	for _, node := range nodeList {
 		details, _, err := cli.NodeInspectWithRaw(ctx, node.ID)
 		if err != nil {
@@ -241,6 +240,10 @@ func CollectNodes(ctx context.Context, cli *client.Client) {
 			Memory:   details.Description.Resources.MemoryBytes / CONVERT_MB, // Convert bytes to MB
 			Version:  details.Meta.Version,
 		}
+		if nodeSpec.Role == "manager" {
+			// Skip the managers
+			continue
+		}
 		_, exists := nodes[nodeSpec.Id]
 		if exists {
 			nodeSpec.AvailableMemory = nodes[nodeSpec.Id].AvailableMemory
@@ -251,6 +254,7 @@ func CollectNodes(ctx context.Context, cli *client.Client) {
 		nodes[nodeSpec.Id] = nodeSpec
 		// TODO: remove if not existing
 	}
+	fmt.Println("Collect Worker Nodes:", len(nodes))
 }
 
 func CollectServices(ctx context.Context, cli *client.Client) {
