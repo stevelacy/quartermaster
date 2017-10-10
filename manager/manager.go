@@ -24,7 +24,7 @@ var DEFAULT_MEMORY int64 = 250 * CONVERT_MB // 250mb
 var NODE_INTERVAL time.Duration = time.Minute * 5
 var SERVICE_INTERVAL time.Duration = time.Second * 30
 
-var Queue = make(chan QueueSpec, 100)
+var Queue = make(chan QueueSpec, 500)
 
 type PostRequest struct {
 	Token   string            `json:"token"`
@@ -127,6 +127,9 @@ func Init(token string) http.Handler {
 					for availableNode.Id == "" {
 						for _, node := range nodes {
 							// TODO: global style mode for requesting nodes
+							if node.Role == "manager" {
+								continue
+							}
 							if node.AvailableMemory > task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes {
 								availableNode = node
 								fmt.Println("scheduled task on node: ", node.Id, "node mem: ", node.AvailableMemory/CONVERT_MB, "task mem:", task.ServiceSpec.TaskTemplate.Resources.Limits.MemoryBytes/CONVERT_MB)
@@ -145,7 +148,7 @@ func Init(token string) http.Handler {
 
 					placement := &swarm.Placement{
 						Constraints: []string{
-							// "node.role == worker", // Disable for local testing
+							"node.role == worker", // Disable for local testing
 							fmt.Sprintf("node.id == %v", availableNode.Id),
 						},
 					}
