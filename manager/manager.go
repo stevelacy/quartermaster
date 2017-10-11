@@ -23,8 +23,9 @@ var CONVERT_CPU int64 = 1000000000
 var DEFAULT_MEMORY int64 = 250 * CONVERT_MB // 250mb
 var NODE_INTERVAL time.Duration = time.Minute * 5
 var SERVICE_INTERVAL time.Duration = time.Second * 30
+var QUEUE_CAP = 1000
 
-var Queue = make(chan QueueSpec, 500)
+var Queue = make(chan QueueSpec, QUEUE_CAP)
 
 type PostRequest struct {
 	Token   string            `json:"token"`
@@ -276,7 +277,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 	for _, existing := range services {
 		found := false
 		for _, listed := range taskList {
-			if listed.ServiceID == existing.Id && listed.Status.State == "running" {
+			if listed.ServiceID == existing.Id && listed.Status.State == "running" || listed.Status.State == "pending" {
 				filtered[existing.Id] = existing
 				found = true
 				break
@@ -284,7 +285,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 		}
 		if found == false {
 			// Delete it
-			fmt.Println("Deleting service")
+			fmt.Println("Deleting service", existing.NodeId, existing.Name)
 			updatedNode := nodes[existing.NodeId]
 			updatedNode.AvailableMemory = updatedNode.AvailableMemory + existing.Memory
 			nodes[existing.NodeId] = updatedNode
