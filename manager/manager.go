@@ -277,7 +277,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 	for _, existing := range services {
 		found := false
 		for _, listed := range taskList {
-			if listed.ServiceID == existing.Id && listed.Status.State == "running" || listed.Status.State == "pending" {
+			if listed.ServiceID == existing.Id && listed.Status.State == "running" {
 				filtered[existing.Id] = existing
 				found = true
 				break
