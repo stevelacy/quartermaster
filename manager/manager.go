@@ -267,7 +267,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 		updatedCount := counts[string(task.Status.State)] + 1
 		counts[string(task.Status.State)] = updatedCount
 	}
-	fmt.Printf("Services: total: %v running: %v stopped: %v complete: %v shutdown: %v failed: %v \n", len(taskList), counts["running"], counts["stopped"], counts["complete"], counts["shutdown"], counts["failed"])
+	fmt.Printf("Services: total: %v, running: %v, stopped: %v, complete: %v, shutdown: %v, failed: %v \n", len(taskList), counts["running"], counts["stopped"], counts["complete"], counts["shutdown"], counts["failed"])
 
 	// Check if they are deleted
 	filtered := make(map[string]ServiceSpec)
