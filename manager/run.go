@@ -74,7 +74,7 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 				},
 			},
 			TaskTemplate: swarm.TaskSpec{
-				ContainerSpec: &swarm.ContainerSpec{
+				ContainerSpec: swarm.ContainerSpec{
 					Image:      response.Image,
 					Labels:     response.Labels,
 					Command:    command,
