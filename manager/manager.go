@@ -1,10 +1,9 @@
 package manager
 
 import (
-	"fmt"
-	// "flag"
-	"encoding/json"
+	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
 	"github.com/julienschmidt/httprouter"
-	"golang.org/x/net/context"
 )
 
 var root_token string = ""
@@ -30,17 +28,17 @@ type PostRequest struct {
 	Command string            `json:"command"`
 	Image   string            `json:"image"`
 	Auth    string            `json:"auth"`
-	Type    string            `json:"type"`
 	Labels  map[string]string `json:"labels`
 	Name    string            `json:"name"`
 	Id      string            `json:"id"`
-	// Cpu     int64  `json:"cpu"`
-	Memory int64 `json:"memory"`
+	Memory  int64             `json:"memory"`
 }
+
 type PostSuccessResponse struct {
 	Success bool   `json:"success"`
 	Id      string `json:"id"`
 }
+
 type PostErrorResponse struct {
 	Success bool   `json:"success"`
 	Code    int    `json:"code"`
@@ -48,6 +46,7 @@ type PostErrorResponse struct {
 	Auth    bool   `json:"auth"`
 	Id      string `json:"id"`
 }
+
 type NodeSpec struct {
 	Id              string
 	Hostname        string
@@ -268,7 +267,7 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 		updatedCount := counts[string(task.Status.State)] + 1
 		counts[string(task.Status.State)] = updatedCount
 	}
-	fmt.Printf("Services: total: %v running: %v stopped: %v complete: %v shutdown: %v failed: %v pending: %v \n", len(taskList), counts["running"], counts["stopped"], counts["complete"], counts["shutdown"], counts["failed"], len(Queue))
+	fmt.Printf("Services: total: %v running: %v stopped: %v complete: %v shutdown: %v failed: %v \n", len(taskList), counts["running"], counts["stopped"], counts["complete"], counts["shutdown"], counts["failed"])
 
 	// Check if they are deleted
 	filtered := make(map[string]ServiceSpec)
@@ -290,25 +289,4 @@ func CollectServices(ctx context.Context, cli *client.Client) {
 		}
 	}
 	services = filtered
-}
-
-func HandleAuth(w http.ResponseWriter, r *http.Request) (PostRequest, error) {
-	w.Header().Set("Content-Type", "application/json")
-	var response PostRequest
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&response)
-	if err != nil {
-		w.WriteHeader(400)
-		payload := PostErrorResponse{Success: false, Error: err.Error(), Code: 400}
-		_ = json.NewEncoder(w).Encode(payload)
-		return PostRequest{}, err
-	}
-	if response.Token != root_token {
-		err := errors.New("Unauthorized")
-		w.WriteHeader(401)
-		payload := PostErrorResponse{Success: false, Error: err.Error(), Code: 400}
-		_ = json.NewEncoder(w).Encode(payload)
-		return PostRequest{}, err
-	}
-	return response, nil
 }

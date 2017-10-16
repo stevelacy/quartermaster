@@ -1,16 +1,15 @@
 package manager
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
 	"github.com/julienschmidt/httprouter"
-	"golang.org/x/net/context"
 )
 
 func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response PostRequest, ctx context.Context, cli *client.Client) {
@@ -32,106 +31,82 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 		requiredMemory = response.Memory * CONVERT_MB
 	}
 
-	if response.Type == "service" {
-		// Testing only has one node, the master node
-		// placement := &swarm.Placement{}
+	// Testing only has one node, the master node
+	// placement := &swarm.Placement{}
 
-		// if flag.Lookup("test.v") == nil {
-		//   placement = &swarm.Placement{
-		//     Constraints: []string{"node.role == worker"},
-		//   }
-		// }
+	// if flag.Lookup("test.v") == nil {
+	//   placement = &swarm.Placement{
+	//     Constraints: []string{"node.role == worker"},
+	//   }
+	// }
 
-		// placement := &swarm.Placement{
-		// 	Constraints: []string{
-		// 		"node.role == worker",
-		// 	},
-		// }
+	// placement := &swarm.Placement{
+	// 	Constraints: []string{
+	// 		"node.role == worker",
+	// 	},
+	// }
 
-		pullOptions := types.ImagePullOptions{}
-		if response.Auth != "" {
-			pullOptions = types.ImagePullOptions{
-				RegistryAuth: response.Auth,
-			}
+	pullOptions := types.ImagePullOptions{}
+	if response.Auth != "" {
+		pullOptions = types.ImagePullOptions{
+			RegistryAuth: response.Auth,
 		}
-		_, err := cli.ImagePull(ctx, response.Image, pullOptions)
-
-		if err != nil {
-			payload := PostErrorResponse{Success: false, Error: err.Error(), Auth: response.Auth != ""}
-			_ = json.NewEncoder(w).Encode(payload)
-			return
-		}
-
-		replicas := uint64(0)
-
-		serviceSpec := swarm.ServiceSpec{
-			Annotations: swarm.Annotations{
-				Name: response.Name,
-			},
-			Mode: swarm.ServiceMode{
-				Replicated: &swarm.ReplicatedService{
-					Replicas: &replicas,
-				},
-			},
-			TaskTemplate: swarm.TaskSpec{
-				ContainerSpec: swarm.ContainerSpec{
-					Image:      response.Image,
-					Labels:     response.Labels,
-					Command:    command,
-					StopSignal: "SIGINT",
-				},
-				Resources: &swarm.ResourceRequirements{
-					Limits: &swarm.Resources{
-						MemoryBytes: int64(requiredMemory),
-					},
-				},
-				// Placement: placement,
-				RestartPolicy: &swarm.RestartPolicy{
-					Condition: "none",
-				},
-			},
-		}
-
-		serviceOptions := types.ServiceCreateOptions{}
-		if response.Auth != "" {
-			serviceOptions = types.ServiceCreateOptions{
-				EncodedRegistryAuth: response.Auth,
-			}
-		}
-		resp, err := cli.ServiceCreate(ctx, serviceSpec, serviceOptions)
-
-		task := QueueSpec{
-			ServiceSpec: serviceSpec,
-			Id:          resp.ID,
-			Cli:         *cli,
-			Ctx:         ctx,
-		}
-
-		Queue <- task
-
-		if err != nil {
-			payload := PostErrorResponse{Success: false, Error: err.Error()}
-			_ = json.NewEncoder(w).Encode(payload)
-			return
-		}
-
-		payload := &PostSuccessResponse{Success: true, Id: resp.ID}
-		_ = json.NewEncoder(w).Encode(payload)
-		return
 	}
+	_, err := cli.ImagePull(ctx, response.Image, pullOptions)
 
-	// Not a service, container
-
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: response.Image,
-		Cmd:   command,
-	}, nil, nil, response.Name)
 	if err != nil {
-		payload := PostErrorResponse{Success: false, Error: err.Error()}
+		payload := PostErrorResponse{Success: false, Error: err.Error(), Auth: response.Auth != ""}
 		_ = json.NewEncoder(w).Encode(payload)
 		return
 	}
-	err = cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
+
+	replicas := uint64(0)
+
+	serviceSpec := swarm.ServiceSpec{
+		Annotations: swarm.Annotations{
+			Name: response.Name,
+		},
+		Mode: swarm.ServiceMode{
+			Replicated: &swarm.ReplicatedService{
+				Replicas: &replicas,
+			},
+		},
+		TaskTemplate: swarm.TaskSpec{
+			ContainerSpec: swarm.ContainerSpec{
+				Image:      response.Image,
+				Labels:     response.Labels,
+				Command:    command,
+				StopSignal: "SIGINT",
+			},
+			Resources: &swarm.ResourceRequirements{
+				Limits: &swarm.Resources{
+					MemoryBytes: int64(requiredMemory),
+				},
+			},
+			// Placement: placement,
+			RestartPolicy: &swarm.RestartPolicy{
+				Condition: "none",
+			},
+		},
+	}
+
+	serviceOptions := types.ServiceCreateOptions{}
+	if response.Auth != "" {
+		serviceOptions = types.ServiceCreateOptions{
+			EncodedRegistryAuth: response.Auth,
+		}
+	}
+	resp, err := cli.ServiceCreate(ctx, serviceSpec, serviceOptions)
+
+	task := QueueSpec{
+		ServiceSpec: serviceSpec,
+		Id:          resp.ID,
+		Cli:         *cli,
+		Ctx:         ctx,
+	}
+
+	Queue <- task
+
 	if err != nil {
 		payload := PostErrorResponse{Success: false, Error: err.Error()}
 		_ = json.NewEncoder(w).Encode(payload)
@@ -140,4 +115,5 @@ func Run(w http.ResponseWriter, r *http.Request, p httprouter.Params, response P
 
 	payload := &PostSuccessResponse{Success: true, Id: resp.ID}
 	_ = json.NewEncoder(w).Encode(payload)
+	return
 }

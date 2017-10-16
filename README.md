@@ -46,7 +46,6 @@ $ curl -X POST \
   "image": "user/image",
   "name": "my_service",
   "labels": { "name": "value" },
-  "type": "service",
   "memory": 1024
 }'
 
@@ -56,15 +55,13 @@ $
   "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
 }
 ```
-Omitting the param `"type": "service"` will run the command as a container
 
 Options:
 - token: Predefined token
-- command: command to run in container or service (see docker service create)
+- command: command to run in service (see docker service create)
 - image: docker image to use
-- name: name of service or container
-- type: type of operation, service or container (Note: must be service on a docker swarm)
-- memory: memory limit for service or container
+- name: name of service
+- memory: memory limit for service
 - labels: set of labels for the service
 
 #### /stop
@@ -111,7 +108,6 @@ curl -X POST \
   "command": "sleep 50",
   "image": "user/private-image",
   "auth":"eyJ1c2VybmFtZSI6InVzZXIiLCAicGFzc3dvcmQiOiJwYXNzd29yZCIsICJhdXRoIjoiIiwgImVtYWlsIjoibmFtZUBleGFtcGxlLmNvbSJ9",
-  "type": "service"
 }'
 ```
 

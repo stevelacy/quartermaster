@@ -68,9 +68,10 @@
   revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","proxy"]
-  revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
+  revision = "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
 
 [[projects]]
   branch = "master"
@@ -81,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c5c0df2d369e78fad12acf3f021f966cd64d3a3b31e059a0be55faabcbd261b0"
+  inputs-digest = "b21f86753f18a197d83059646aaa8d8239c6a558cd8e903848ea21db2361dbab"
   solver-name = "gps-cdcl"
   solver-version = 1
