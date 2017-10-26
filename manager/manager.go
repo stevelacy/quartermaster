@@ -37,6 +37,7 @@ type PostRequest struct {
 type PostSuccessResponse struct {
 	Success bool   `json:"success"`
 	Id      string `json:"id"`
+	Status  string `json:"status"`
 }
 
 type PostErrorResponse struct {
@@ -201,9 +202,19 @@ func Init(token string) http.Handler {
 	router.POST("/stop", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		response, err := HandleAuth(w, r)
 		if err != nil {
+			fmt.Fprint(w, err)
 			return
 		}
 		Stop(w, r, p, response, ctx, cli)
+	})
+
+	router.GET("/status/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		response, err := HandleGetAuth(w, r)
+		if err != nil {
+			fmt.Fprint(w, err)
+			return
+		}
+		Status(w, r, p, response, ctx, cli)
 	})
 
 	return router

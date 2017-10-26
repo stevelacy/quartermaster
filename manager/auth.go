@@ -26,3 +26,12 @@ func HandleAuth(w http.ResponseWriter, r *http.Request) (PostRequest, error) {
 	}
 	return response, nil
 }
+
+func HandleGetAuth(w http.ResponseWriter, r *http.Request) (PostRequest, error) {
+	token := r.URL.Query().Get("token")
+	if token != root_token {
+		w.WriteHeader(401)
+		return PostRequest{}, errors.New("Unauthorized")
+	}
+	return PostRequest{}, nil
+}

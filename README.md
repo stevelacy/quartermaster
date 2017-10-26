@@ -75,7 +75,7 @@ $ curl -X POST \
   -d '{
   "token": "4jrs8-534js-345ds-3lrd0",
   "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
-}'
+  }'
 
 $
 {
@@ -83,6 +83,32 @@ $
   "id": "a52f382c82a7d101b8ee3bbaa9ff59243b43c95915f1da579f35df0c4af0c822"
 }
 ```
+
+
+#### /status/:id?token=<auth token>
+
+Get the status of the service
+```curl
+
+curl -X GET \
+  'http://localhost:9090/status/4k6ej6kuc67s55bbb5ufg5uao?token=6sdsd-94sdkf-43dsf-4245' \
+  -H 'content-type: application/json' \
+  -d '{
+  "token": "6sdsd-94sdkf-43dsf-4245",
+  "command": "sleep 50",
+  "image": "alpine",
+  "memory": 250,
+  "labels": { "name": "value" },
+  "type":"service"
+  }'
+$
+{
+  "success":true,
+  "id":"szzn6kjmmxqc1wkhxhi16kah8",
+  "status":"started"
+}
+```
+
 
 ### Authentication from private registries
 Pass the `auth` key in the `run` request for it to pull from the private registry per swarm node.
