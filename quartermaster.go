@@ -6,6 +6,7 @@ import (
 	"github.com/stevelacy/quartermaster/manager"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -17,11 +18,27 @@ func main() {
 	memoryDescription := "Memory limit for each task, 250 by default"
 
 	token := flag.String("token", "", tokenDescription)
-	port := flag.String("port", "9090", portDescription)
-	memory := flag.Int64("memory", 250, memoryDescription)
+	port := flag.String("port", "", portDescription)
+	memory := flag.Int64("memory", 0, memoryDescription)
 
 	if *token == "" {
 		*token = os.Getenv("TOKEN")
+	}
+
+	if *port == "" {
+		*port = os.Getenv("PORT")
+	}
+
+	if *memory == 0 {
+		envmem := os.Getenv("MEMORY")
+		if envmem == "" {
+			envmem = "250"
+		}
+		mem, err := strconv.Atoi(envmem)
+		if err != nil {
+			panic(err)
+		}
+		*memory = int64(mem)
 	}
 
 	flag.Parse()
