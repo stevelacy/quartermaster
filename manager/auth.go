@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func HandleAuth(w http.ResponseWriter, r *http.Request) (PostRequest, error) {
+func HandlePostAuth(w http.ResponseWriter, r *http.Request) (PostRequest, error) {
 	w.Header().Set("Content-Type", "application/json")
 	var response PostRequest
 	decoder := json.NewDecoder(r.Body)

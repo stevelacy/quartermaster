@@ -13,7 +13,10 @@ Uses [dep](https://github.com/golang/dep) to manage dependencies.
 
 `$ ./build.sh`
 
-## Run
+## Initialize
+
+
+#### token
 
 The `token` option is a user defined random character sequence, for instance `$ uuidgen` on certain UNIX systems. Treat this as the universal key for controlling the swarm.
 
@@ -25,6 +28,15 @@ Using the `--token` flag:
 
 `$ ./quartermaster --token=4jrs8-534js-345ds-3lrd0`
 
+#### memory
+
+The `memory` option sets the memory limit for all tasks
+
+`$ ./quartermaster --memory=500`
+
+#### port
+
+Set the listening port
 
 **Note:** all jobs are run on docker swarm nodes with `role=worker`
 

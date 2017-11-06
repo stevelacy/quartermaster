@@ -16,7 +16,7 @@ import (
 var root_token string = ""
 var CONVERT_MB int64 = 1048576
 var CONVERT_CPU int64 = 1000000000
-var DEFAULT_MEMORY int64 = 250 * CONVERT_MB // 250mb
+var DEFAULT_MEMORY int64
 var NODE_INTERVAL time.Duration = time.Minute * 5
 var SERVICE_INTERVAL time.Duration = time.Second * 30
 var QUEUE_CAP = 1000
@@ -89,7 +89,8 @@ type QueueSpec struct {
 var nodes = make(map[string]NodeSpec)
 var services = make(map[string]ServiceSpec)
 
-func Init(token string) http.Handler {
+func Init(token string, memory int64) http.Handler {
+	DEFAULT_MEMORY = memory * CONVERT_MB
 	router := httprouter.New()
 	root_token = token
 
@@ -191,7 +192,7 @@ func Init(token string) http.Handler {
 	}()
 
 	router.POST("/run", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		response, err := HandleAuth(w, r)
+		response, err := HandlePostAuth(w, r)
 		if err != nil {
 			fmt.Fprint(w, err)
 			return
@@ -200,7 +201,7 @@ func Init(token string) http.Handler {
 	})
 
 	router.POST("/stop", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		response, err := HandleAuth(w, r)
+		response, err := HandlePostAuth(w, r)
 		if err != nil {
 			fmt.Fprint(w, err)
 			return
