@@ -27,6 +27,9 @@ func main() {
 
 	if *port == "" {
 		*port = os.Getenv("PORT")
+		if *port == "" {
+			*port = "9090"
+		}
 	}
 
 	if *memory == 0 {
