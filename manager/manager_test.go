@@ -8,7 +8,7 @@ import (
 )
 
 func TestInitResponse(t *testing.T) {
-	ts := httptest.NewServer(Init("test-token"))
+	ts := httptest.NewServer(Init("test-token", 250))
 	defer ts.Close()
 
 	res, err := http.Get(ts.URL)
@@ -21,7 +21,7 @@ func TestInitResponse(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
-	ts := httptest.NewServer(Init("test-token"))
+	ts := httptest.NewServer(Init("test-token", 250))
 	defer ts.Close()
 
 	res, err := http.NewRequest("POST", "/run", nil)
