@@ -1,5 +1,5 @@
 #!/bin/bash
 
 go get
-CGO_ENABLED=0 go build
+GOOS=linux GOARCH=386 CGO_ENABLED=0 go build
 docker build -t stevelacy/quartermaster .
