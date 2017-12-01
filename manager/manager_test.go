@@ -28,5 +28,5 @@ func TestRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Printf("", res)
+	fmt.Printf(res)
 }
